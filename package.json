@@ -1,0 +1,16 @@
+{
+  "name": "webpack-4-analysis",
+  "version": "0.0.1",
+  "description": "An analysis oof Webpack 4's default output with chunks",
+  "main": "index.js",
+  "scripts": {
+    "webpack": "webpack"
+  },
+  "author": "Mike Skalandunas <mskalandunas@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "html-webpack-plugin": "^4.3.0",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
+  }
+}
