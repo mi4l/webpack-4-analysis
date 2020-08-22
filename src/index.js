@@ -1,4 +1,4 @@
-import { toUppercase } from './utils';
+import { log } from './utils';
 
 const getTodoHandlers = () => import('./todo');
 
@@ -7,21 +7,29 @@ const getTodoHandlers = () => import('./todo');
   const listItemsFragment = document.createDocumentFragment();
 
   todos.forEach(todo => {
+    // TODO
+    // - add event delegation
+    // - <li><button>text</button></li>
     const li = document.createElement('li');
 
-    li.textContent = toUppercase(todo);
+    li.textContent = todo;
     li.addEventListener('click', e => {
       getTodoHandlers().then(m => {
         m.default.complete(e.target);
+
+        log(`COMPLETED ITEM: "${e.target.textContent}"`);
       });
     });
     listItemsFragment.appendChild(li);
   });
-  
+
   list.appendChild(listItemsFragment);
 
-  document.getElementsByTagName('body')[0].appendChild(list);
+  document
+    .getElementsByTagName('body')[0]
+    .appendChild(list);
 })([
-  'Create article about webpack bundles',
-  'Create article about hot module replacement'
+  'Repot succulents',
+  'Fill bird feeders',
+  'Restring Cordoba'
 ]);
