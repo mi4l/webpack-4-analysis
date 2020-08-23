@@ -312,6 +312,12 @@
 /******/
 /******/    // define getter function for harmony exports
 /******/    __webpack_require__.d = function(exports, name, getter) {
+              /*
+                Args:
+                exports is the exports module coming from a static import
+                name is the name of the export
+                getter is a function that returns whatever's being exports
+              */
 /******/      if(!__webpack_require__.o(exports, name)) {
 /******/        Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/      }
@@ -364,10 +370,10 @@
 /******/    __webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
             /*
               A wrapper function for hasOwnProperty. This is used in
-              `__webpack_require__.d` because <???????>
+              `__webpack_require__.d` to check if an exports object already has
+              a property of a specified name.
 
-              TODO - See why it exists and explain its use case.
-
+              TODO - See why it exists rather than just using hasOwnProperty.
             */
 /******/
 /******/    // __webpack_public_path__
@@ -480,51 +486,67 @@
     "use strict";
     eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ \"./src/utils.js\");\n\n\nconst getTodoHandlers = () => __webpack_require__.e(/*! import() */ 0).then(__webpack_require__.bind(null, /*! ./todo */ \"./src/todo.js\"));\n\n(todos => {\n  const list = document.createElement('ul');\n  const listItemsFragment = document.createDocumentFragment();\n\n  todos.forEach(todo => {\n    const li = document.createElement('li');\n\n    li.textContent = Object(_utils__WEBPACK_IMPORTED_MODULE_0__[\"toUppercase\"])(todo);\n    li.addEventListener('click', e => {\n      getTodoHandlers().then(m => {\n        m.default.complete(e.target);\n      });\n    });\n    listItemsFragment.appendChild(li);\n  });\n  \n  list.appendChild(listItemsFragment);\n\n  document.getElementsByTagName('body')[0].appendChild(list);\n})([\n  'Create article about webpack bundles',\n  'Create article about hot module replacement'\n]);\n\n//# sourceURL=webpack:///./src/index.js?");
     /*
+      Code content is stringified when built and webpack encapsulation and runtime handlers
+      are injected. Below is the string content formatted in a more readable fashion:
+    */
+    /*
       eval("
         __webpack_require__.r(__webpack_exports__)
-        ;\n */
+        /* Defines __esModule on exports */
         /* harmony import *//*
         var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(*//*! ./utils *//* \"./src/utils.js\");
-        \n\n\n
+        /*
+          Brings the src/utils file's exports into scope via __webpack_require__ call with ./src/utils.js as
+          the argument
+        */
+
+        /*
         const getTodoHandlers = () => __webpack_require__.e(/*! import() *//* 0)
           .then(__webpack_require__.bind(null, /*! ./todo *//* \"./src/todo.js\"));
-        \n\n
-        (todos => {
-          \n
-          const list = document.createElement('ul');
-          \n
-          const listItemsFragment = document.createDocumentFragment();
-          \n\n
-          todos.forEach(todo => {
-            \n
-            const li = document.createElement('li');
-            \n\n
-            li.textContent = Object(_utils__WEBPACK_IMPORTED_MODULE_0__[\"toUppercase\"])(todo);
-            \n
-            li.addEventListener('click', e => {
-              \n
-              getTodoHandlers().then(m => {
-                \n
-                m.default.complete(e.target);
-                \n
-              });\n
-            });\n
-            listItemsFragment.appendChild(li);\n
-          });\n  \n
+          /*
+            Anonymous function set to a constant that will call __webpack_require__.e,
+            returning a promise with getTodoHandlers, calling .then, and returning a new function with
+            __webpack_require__.bind that takes src/todo.js as its  argument.
 
-          list.appendChild(listItemsFragment);\n\n
+            TODO - figure out if these are "magic comments" that are generated to retain bundle names. They
+            don't seem to be, since todo.js isn't a bundle. Maybe it's just left to tell the user where their
+            code came from?
+          */
+        /*
+        (todos => {
+          Here is my original application but with a difference.
+
+          const list = document.createElement('ul');
+          const listItemsFragment = document.createDocumentFragment();
+
+          todos.forEach(todo => {
+            const li = document.createElement('li');
+
+            li.textContent = Object(_utils__WEBPACK_IMPORTED_MODULE_0__[\"toUppercase\"])(todo);
+            Webpack has replaced the original function call with a reference to the module
+            pulled into scope above via __webpack_require__.
+
+            li.addEventListener('click', e => {
+              getTodoHandlers().then(m => {
+                m.default.complete(e.target);
+              });
+            });
+            listItemsFragment.appendChild(li);
+          });
+
+          list.appendChild(listItemsFragment);
 
           document
             .getElementsByTagName('body')[0]
             .appendChild(list);
-            \n
-          })([\n
-            'Create article about webpack bundles',\n
-            'Create article about hot module replacement'\n
-          ]);
 
-          \n\n//# sourceURL=webpack:///./src/index.js?");
-    */
+          })([
+            'Create article about webpack bundles',
+            'Create article about hot module replacement'
+          ]);
+          //# sourceURL=webpack:///./src/index.js?");
+          /* TODO - explain sourceURL */
+          */
 
     /***/ }),
 
@@ -537,6 +559,16 @@
 
     "use strict";
     eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"toUppercase\", function() { return toUppercase; });\nconst toUppercase = string => string.toUpperCase();\n\n//# sourceURL=webpack:///./src/utils.js?");
+    /*
+      This import is similar to what we saw in the entrypoint, except we also have a __webpack_require__.d call
+      that adds a .get method to the export object that will return the function exported in the utils.js file.
+
+      1. __webpack_require__.r is called on __webpack_exports__
+      2. __webpack_exports__ is mutated
+      3. __webpack_require__.d is called on __webpack_exports__, the name of the exported function,
+        and a getter that returns functions later declared in the file
+      4. __webpack_exports__ is once again mutated with the updated exports
+    */
 
     /***/ })
 
