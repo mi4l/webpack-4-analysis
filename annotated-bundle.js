@@ -1,4 +1,5 @@
 /*
+  Webpack version 4.44.1
   Annotated bundle generated with two modules:
   - one concat
 */
@@ -6,15 +7,31 @@
 /******/  (function(modules) { // webpackBootstrap
             /*
               This function is what bootstraps an application inside of a
-              webpack iife (immediatley invoked function expression). It creates
-              a scope for all of our modules to live in.
+              webpack IIFE (immediatley invoked function expression). It creates
+              a scope for all of our modules to live in, and our code to be executed
+              in.
             */
 
+            /*
+              The `modules` argument is an associative array(POJO) containing modules
+              used at runtime.  In this case that's our index.js and utils.js files.
+              {
+                './src/index.js': function(module, __webpack_exports__, __webpack_require__) { ... },
+                './src/utils.js': function(module, __webpack_exports__, __webpack_require__) { ... }
+              }
+            */
 /******/    // install a JSONP callback for chunk loading
 /******/    function webpackJsonpCallback(data) {
             /*
               This function is generated when the import
-              function is used to import a file at runtime
+              function is used to import a file at runtime. It's
+              a sequence of instructions for exposing a dynamic
+              import to the parent scope.
+
+              //////////// FIND LINE IN WEBPACK SOURCE WHERE THIS HAPPENS
+                - it'd be good to know exactly what conditions generate this function,
+                  as well as point to where this file is created so users can see  more
+                  conditionally generated functions
 
               If a bundle doesn't have a dynamic import, like
               we do on line 3 of index.js, it won't include this function
@@ -48,6 +65,14 @@
               */
 
 /******/      var moreModules = data[1];
+              /*
+                Establishes a reference to an object containing modules.
+
+                ///////// FIGURE OUT WHEN MORE MODULES HAS MORE THAN ONE MODULE
+                {
+                  './src/todos.js': function(module, __webpack_exports__, __webpack_require__) {...}
+                }
+              */
 /******/
 /******/
 /******/      // add "moreModules" to the modules object,
@@ -55,12 +80,15 @@
 /******/      var moduleId, chunkId, i = 0, resolves = [];
 /******/      for(;i < chunkIds.length; i++) {
 /******/        chunkId = chunkIds[i];
+
 /******/        if(Object.prototype.hasOwnProperty.call(installedChunks, chunkId) && installedChunks[chunkId]) {
+                  /* Check for property of chunkId and if it's truthy */
 /******/          resolves.push(installedChunks[chunkId][0]);
 /******/        }
 /******/        installedChunks[chunkId] = 0;
 /******/      }
 /******/      for(moduleId in moreModules) {
+                /* iterate over moreModules and if the moduleId exists in it, add its value to `modules`
 /******/        if(Object.prototype.hasOwnProperty.call(moreModules, moduleId)) {
 /******/          modules[moduleId] = moreModules[moduleId];
 /******/        }
@@ -69,9 +97,13 @@
 /******/
 /******/      while(resolves.length) {
 /******/        resolves.shift()();
+                /*
+                  `resolves` queue members are shifted and then called
+                */
 /******/      }
 /******/
 /******/    };
+            /* End of webpackJsonpCallback */
 /******/
 /******/
 /******/    // The module cache
@@ -179,6 +211,8 @@
 /******/
 /******/    // expose the modules object (__webpack_modules__)
 /******/    __webpack_require__.m = modules;
+            /* Self-explanatory */
+
 /******/
 /******/    // expose the module cache
 /******/    __webpack_require__.c = installedModules;
