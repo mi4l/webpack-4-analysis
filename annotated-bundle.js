@@ -62,6 +62,8 @@
               /*
                 Establishes a reference to an array containing chunk ids. In
                 this instance the referenced value is [0]
+
+                Later this will be used to...
               */
 
 /******/      var moreModules = data[1];
@@ -72,12 +74,34 @@
                 {
                   './src/todos.js': function(module, __webpack_exports__, __webpack_require__) {...}
                 }
+
+                Later this will be used to...
               */
 /******/
 /******/
 /******/      // add "moreModules" to the modules object,
 /******/      // then flag all "chunkIds" as loaded and fire callback
-/******/      var moduleId, chunkId, i = 0, resolves = [];
+/******/      var moduleId,
+                  /*
+                    Instantiated now rather than in the for/in loop. This will be used
+                    to check if the id exists in `moreModules`, and, if it does, set
+                    a key of `moduleId` to the value of `moreModules[moduleId]` in
+                    `modules` (modules[moduleId] = moreModules[moduleId])
+                  */
+                  chunkId,
+                  /*
+                    A bucket used for each chunk id in a for loop (chunkId = chunkIds[i])
+                  */
+                  i = 0,
+                  /*
+                    Instantiating here rather than in for loop
+                  */
+                  resolves = [];
+                  /*
+                    An array for Promise `resolve` functions to be placed for dynamic loading.
+                    In the body of a Promise constructor's callback, the resolve function is passed
+                    in an `installedChunksData` var in the form of [resolve, reject].
+                  */
 /******/      for(;i < chunkIds.length; i++) {
 /******/        chunkId = chunkIds[i];
 
@@ -119,6 +143,10 @@
 /******/
 /******/    // The module cache
 /******/    var installedModules = {};
+            /*
+              When a module is loaded, it is cached here. Any future references will hit this
+              cache first.
+            */
 /******/
 /******/    // object to store loaded and loading chunks
 /******/    // undefined = chunk not loaded, null = chunk preloaded/prefetched
@@ -126,30 +154,56 @@
 /******/    var installedChunks = {
 /******/      "main": 0
 /******/    };
+            /*
+              A quick lookup for whether or not a chunk has been loaded. The webpackJsonpCallback
+              uses this tto see if it needs to load a chunk.
+            */
 /******/
 /******/
 /******/
 /******/    // script path function
 /******/    function jsonpScriptSrc(chunkId) {
 /******/      return __webpack_require__.p + "" + ({}[chunkId]||chunkId) + ".js"
+            /* TODO - understand why this expression is used */
 /******/    }
 /******/
 /******/    // The require function
 /******/    function __webpack_require__(moduleId) {
+            /*
+              The webpack require function is the primary handler of module
+              loading and encapsulation. It's passed into each module's related
+              scope as an argument, and exposes that module to the parent. It also has
+              many helper functions and properties set that allow it to ensure
+              each module can be executed, as well as other chunks can be loaded.
+            */
 /******/
 /******/      // Check if module is in cache
 /******/      if(installedModules[moduleId]) {
 /******/        return installedModules[moduleId].exports;
+                /*
+                  If cached, exit early with cached module
+
+                  TODO - See what situation would require this.
+                */
 /******/      }
 /******/      // Create a new module (and put it into the cache)
 /******/      var module = installedModules[moduleId] = {
 /******/        i: moduleId,
+                /* id  */
 /******/        l: false,
+                /* loaded true/false */
 /******/        exports: {}
+                /* "synthetic exports"
 /******/      };
 /******/
 /******/      // Execute the module function
 /******/      modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+              /*
+                The function being executed here is the value of the modules object passed in at
+                the top.  Basically looks like this: { './src/index.js': function(..) {}}.  It contains
+                a string representing our code wrapped in an `eval` call plus generated webpack
+                functions that are used to load and expose modules to the parent scope.
+              */
 /******/
 /******/      // Flag the module as loaded
 /******/      module.l = true;
@@ -161,6 +215,10 @@
 /******/    // This file contains only the entry chunk.
 /******/    // The chunk loading function for additional chunks
 /******/    __webpack_require__.e = function requireEnsure(chunkId) {
+              /*
+                Handles loading of dynamically imported chunks. If successful,
+                this will append a script tag to the doc head.
+              */
 /******/      var promises = [];
 /******/
 /******/
@@ -168,16 +226,31 @@
 /******/
 /******/      var installedChunkData = installedChunks[chunkId];
 /******/      if(installedChunkData !== 0) { // 0 means "already installed".
+                /* Main loading block is skipped if chunk is already installed */
 /******/
 /******/        // a Promise means "currently loading".
 /******/        if(installedChunkData) {
+                  /*
+                    On first load of a module, this condition can not be true
+
+                    TODO - see when this condition is true
+                  */
 /******/          promises.push(installedChunkData[2]);
 /******/        } else {
+                  /* TODO - see when else condition is hit */
 /******/          // setup Promise in chunk cache
 /******/          var promise = new Promise(function(resolve, reject) {
 /******/            installedChunkData = installedChunks[chunkId] = [resolve, reject];
+                    /*
+                      Set installedChunkData and installedChunks[chunkId] to a reference of
+                      an array that currently holds [resolve, reject] params.
+                    */
 /******/          });
 /******/          promises.push(installedChunkData[2] = promise);
+                  /*
+                    Set installedChunkData[2] to promise // now looks like [resolve, reject, promise]
+                    and push the promise into the promises array
+                  */
 /******/
 /******/          // start chunk loading
 /******/          var script = document.createElement('script');
@@ -186,9 +259,11 @@
 /******/          script.charset = 'utf-8';
 /******/          script.timeout = 120;
 /******/          if (__webpack_require__.nc) {
+                    /* TODO - see what this does */
 /******/            script.setAttribute("nonce", __webpack_require__.nc);
 /******/          }
 /******/          script.src = jsonpScriptSrc(chunkId);
+                  /* Sets source of script tag to file name generated by jsonScriptSrc (would be 0.js for this bundle) */
 /******/
 /******/          // create error before stack unwound to get useful stacktrace later
 /******/          var error = new Error();
@@ -198,6 +273,11 @@
 /******/            clearTimeout(timeout);
 /******/            var chunk = installedChunks[chunkId];
 /******/            if(chunk !== 0) {
+                      /*
+                        If there's an issue loading the chunk, since all loaded chunks should be
+                        a `0`, create an error saying that 'Loading chunk <chunkId> failed.', and
+                        set that chunkId in installedChunks to undefined.
+                      */
 /******/              if(chunk) {
 /******/                var errorType = event && (event.type === 'load' ? 'missing' : event.type);
 /******/                var realSrc = event && event.target && event.target.src;
@@ -212,12 +292,14 @@
 /******/          };
 /******/          var timeout = setTimeout(function(){
 /******/            onScriptComplete({ type: 'timeout', target: script });
+                    /* Fire onScriptComplete (error handling) callback after 120 seconds
 /******/          }, 120000);
 /******/          script.onerror = script.onload = onScriptComplete;
 /******/          document.head.appendChild(script);
-/******/        }
+/******/        } /* END OF ELSE */
 /******/      }
 /******/      return Promise.all(promises);
+              /* TODO - finally learn what promise.all does */
 /******/    };
 /******/
 /******/    // expose the modules object (__webpack_modules__)
@@ -249,6 +331,11 @@
 /******/    // mode & 4: return value when already ns object
 /******/    // mode & 8|1: behave like require
 /******/    __webpack_require__.t = function(value, mode) {
+              /*
+                This isn't used in our code.
+
+                TODO - See why it exists and explain its use case.
+              */
 /******/      if(mode & 1) value = __webpack_require__(value);
 /******/      if(mode & 8) return value;
 /******/      if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
@@ -261,6 +348,11 @@
 /******/
 /******/    // getDefaultExport function for compatibility with non-harmony modules
 /******/    __webpack_require__.n = function(module) {
+              /*
+                This isn't used in our code.
+
+                TODO - See why it exists and explain its use case.
+              */
 /******/      var getter = module && module.__esModule ?
 /******/        function getDefault() { return module['default']; } :
 /******/        function getModuleExports() { return module; };
@@ -269,23 +361,27 @@
 /******/    };
 /******/
 /******/    // Object.prototype.hasOwnProperty.call
-/******/    __webpack_require__.o() = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/    __webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
             /*
               A wrapper function for hasOwnProperty. This is used in
-              `__webpack_require__.d` because <>???????>
+              `__webpack_require__.d` because <???????>
+
+              TODO - See why it exists and explain its use case.
 
             */
 /******/
 /******/    // __webpack_public_path__
 /******/    __webpack_require__.p = "";
-            /* Need to figure out how this is altered */
+            /*
+              TODO - See how this is altered and explain what it does
+            */
 /******/
 /******/    // on error function for async loading
 /******/    __webpack_require__.oe = function(err) { console.error(err); throw err; };
             /*
               This is unused in output generatd by this project.  Should figure out when it is used.
 
-              It is used in a catch block
+              TODO - See why it exists and explain its use case.
             */
 /******/
 
@@ -294,7 +390,8 @@
 /******/    var jsonpArray = window["webpackJsonp"] = window["webpackJsonp"] || [];
             /*
               Create a global reference to jsonpArray
-              Why create a global ref now?
+              TODO - Why create a global ref here?
+                - Looks like it's used in dynamic loading
             */
 /******/    var oldJsonpFunction = jsonpArray.push.bind(jsonpArray);
             /*
@@ -305,7 +402,7 @@
               jsonparray's prototype.push is overwritten in favor of webacpkJsonpCallback,
               the function declared at the top of the bundle.
 
-              Why overwrite push?  It seems like this could be a new function on the prototype,
+              TODO - Why overwrite push?  It seems like this could be a new function on the prototype,
               or a completely external pure function.
             */
 
@@ -349,6 +446,10 @@
 /******/
 /******/    // Load entry module and return exports
 /******/    return __webpack_require__(__webpack_require__.s = "./src/index.js");
+            /*
+              Sets __webpack_require__.s to the entrypoint and passes it into a __webpack_require__
+              call
+            */
 /******/  })
 /************************************************************************/
 /******/  ({
@@ -359,9 +460,71 @@
   \**********************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
+    /*
+      Our main entrypoint. Here's what's being passed in:
+      module: {
+        i: './src/index.js', // the chunk id
+        l: false, // whether or not the module has been loaded
+        exports: {} // the exports of this module
+      }
 
+      After being evaluated in this file, the module is mutated to look more like this:
+      {
+        i: './src/index.js', // id remains the same
+        l: true, // has been loaded
+        exports: Module // export is now a Module
+
+        TODO - what is a module?
+      }
+    */
     "use strict";
     eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ \"./src/utils.js\");\n\n\nconst getTodoHandlers = () => __webpack_require__.e(/*! import() */ 0).then(__webpack_require__.bind(null, /*! ./todo */ \"./src/todo.js\"));\n\n(todos => {\n  const list = document.createElement('ul');\n  const listItemsFragment = document.createDocumentFragment();\n\n  todos.forEach(todo => {\n    const li = document.createElement('li');\n\n    li.textContent = Object(_utils__WEBPACK_IMPORTED_MODULE_0__[\"toUppercase\"])(todo);\n    li.addEventListener('click', e => {\n      getTodoHandlers().then(m => {\n        m.default.complete(e.target);\n      });\n    });\n    listItemsFragment.appendChild(li);\n  });\n  \n  list.appendChild(listItemsFragment);\n\n  document.getElementsByTagName('body')[0].appendChild(list);\n})([\n  'Create article about webpack bundles',\n  'Create article about hot module replacement'\n]);\n\n//# sourceURL=webpack:///./src/index.js?");
+    /*
+      eval("
+        __webpack_require__.r(__webpack_exports__)
+        ;\n */
+        /* harmony import *//*
+        var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(*//*! ./utils *//* \"./src/utils.js\");
+        \n\n\n
+        const getTodoHandlers = () => __webpack_require__.e(/*! import() *//* 0)
+          .then(__webpack_require__.bind(null, /*! ./todo *//* \"./src/todo.js\"));
+        \n\n
+        (todos => {
+          \n
+          const list = document.createElement('ul');
+          \n
+          const listItemsFragment = document.createDocumentFragment();
+          \n\n
+          todos.forEach(todo => {
+            \n
+            const li = document.createElement('li');
+            \n\n
+            li.textContent = Object(_utils__WEBPACK_IMPORTED_MODULE_0__[\"toUppercase\"])(todo);
+            \n
+            li.addEventListener('click', e => {
+              \n
+              getTodoHandlers().then(m => {
+                \n
+                m.default.complete(e.target);
+                \n
+              });\n
+            });\n
+            listItemsFragment.appendChild(li);\n
+          });\n  \n
+
+          list.appendChild(listItemsFragment);\n\n
+
+          document
+            .getElementsByTagName('body')[0]
+            .appendChild(list);
+            \n
+          })([\n
+            'Create article about webpack bundles',\n
+            'Create article about hot module replacement'\n
+          ]);
+
+          \n\n//# sourceURL=webpack:///./src/index.js?");
+    */
 
     /***/ }),
 
