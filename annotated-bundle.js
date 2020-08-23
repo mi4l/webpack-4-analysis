@@ -84,8 +84,14 @@
 /******/        if(Object.prototype.hasOwnProperty.call(installedChunks, chunkId) && installedChunks[chunkId]) {
                   /* Check for property of chunkId and if it's truthy */
 /******/          resolves.push(installedChunks[chunkId][0]);
+                  /* pushes a Promise constructor's resolve callback into the `resolves` array */
 /******/        }
 /******/        installedChunks[chunkId] = 0;
+                /*
+                  mutates installedChunks object and sets the chunkId to 0. If this function is called again,
+                  it won't try to load the same module twice since now the `installedChunks[chunkId]` condition
+                  will fail.
+                */
 /******/      }
 /******/      for(moduleId in moreModules) {
                 /* iterate over moreModules and if the moduleId exists in it, add its value to `modules`
@@ -94,6 +100,11 @@
 /******/        }
 /******/      }
 /******/      if(parentJsonpFunction) parentJsonpFunction(data);
+              /*
+                At runtime, parentJsonpFunction is set to oldJsonpFunction, which is simply [].push
+                bound to the jsonpArray reference. What that means is if this function exists, push
+                data into the jsonpArray.
+              */
 /******/
 /******/      while(resolves.length) {
 /******/        resolves.shift()();
@@ -258,20 +269,82 @@
 /******/    };
 /******/
 /******/    // Object.prototype.hasOwnProperty.call
-/******/    __webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/    __webpack_require__.o() = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+            /*
+              A wrapper function for hasOwnProperty. This is used in
+              `__webpack_require__.d` because <>???????>
+
+            */
 /******/
 /******/    // __webpack_public_path__
 /******/    __webpack_require__.p = "";
+            /* Need to figure out how this is altered */
 /******/
 /******/    // on error function for async loading
 /******/    __webpack_require__.oe = function(err) { console.error(err); throw err; };
+            /*
+              This is unused in output generatd by this project.  Should figure out when it is used.
+
+              It is used in a catch block
+            */
 /******/
+
+
+            /* Utilities for dynamically importing modules */
 /******/    var jsonpArray = window["webpackJsonp"] = window["webpackJsonp"] || [];
+            /*
+              Create a global reference to jsonpArray
+              Why create a global ref now?
+            */
 /******/    var oldJsonpFunction = jsonpArray.push.bind(jsonpArray);
+            /*
+              array.push is bound to oldJsonpFunction
+            */
 /******/    jsonpArray.push = webpackJsonpCallback;
+            /*
+              jsonparray's prototype.push is overwritten in favor of webacpkJsonpCallback,
+              the function declared at the top of the bundle.
+
+              Why overwrite push?  It seems like this could be a new function on the prototype,
+              or a completely external pure function.
+            */
+
 /******/    jsonpArray = jsonpArray.slice();
+            /*
+              create a copy of the jsonpArray. This reference is still active because the
+              variable is declared using var.
+
+              window.webpackJsonpArray === jsonpArray
+
+              If it were done with let (let jsonpArray = window['webpackJsonpArray']...), it'd be
+              window.webpackJsonpArray !== jsonpArray
+            */
 /******/    for(var i = 0; i < jsonpArray.length; i++) webpackJsonpCallback(jsonpArray[i]);
+            /*
+              This is where webpackJsonpCallback is finally used.  Each member of the jsonpArray is
+                1. passed into webpackJsonpCallback
+                2. checks to see if chunkId (member data [0]) exists in installedChunks and that it's truthy
+                3. pushes the installedChunk's `resolve` function into the `resolves` array
+                  - This comes from __webpack_require__.e,
+                    var promise = new Promise(function(resolve, reject) {
+                      installedChunkData = installedChunks[chunkId] = [resolve, reject];
+                    });
+                  - Each time an `import()` is called, it'll run through __webpack_require__.e.
+                    - __webpack_require__.e first checks to see if the installedChunks[chunkId] value is 0.
+                      - if it is, it will bypass executing any logic that re-"fetches" the module's code
+                4. mutates the installedChunks object and sets the chunkId to 0.
+                5. adds any included modules to the `modules` object in scope (passed in as an
+                   argument to the encapsulating function)
+                6. pushes the data into the jsonpArray via the parentJsonpFunction ([].push bound to jsonpArray)
+                   if the parentJsonpFunction exists
+                7. removes each item from the `resolves` queue and calls it
+            */
+
 /******/    var parentJsonpFunction = oldJsonpFunction;
+            /*
+              parentJsonpFunction is set to oldJsonpFunction, which at this time is [].push. This is used
+              to add loaded modules to the jsonpArray (also window.webpackJsonpArray)
+            */
 /******/
 /******/
 /******/    // Load entry module and return exports
