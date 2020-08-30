@@ -4,7 +4,8 @@
   "description": "An analysis oof Webpack 4's default output with chunks",
   "main": "index.js",
   "scripts": {
-    "webpack": "webpack"
+    "build": "webpack",
+    "watch": "webpack --watch"
   },
   "author": "Mike Skalandunas <mskalandunas@gmail.com>",
   "license": "MIT",

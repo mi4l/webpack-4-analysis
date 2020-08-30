@@ -1,35 +1,28 @@
 import { log } from './utils';
 
 const getTodoHandlers = () => import('./todo');
+const listItemTemplate = text => `<li><button>${text}</button></li>`;
 
 (todos => {
   const list = document.createElement('ul');
-  const listItemsFragment = document.createDocumentFragment();
 
-  todos.forEach(todo => {
-    // TODO
-    // - add event delegation
-    // - <li><button>text</button></li>
-    const li = document.createElement('li');
-
-    li.textContent = todo;
-    li.addEventListener('click', e => {
+  list.innerHTML = todos.reduce(
+    (html, todo) => html + listItemTemplate(todo),
+    ''
+  );
+  list.addEventListener('click', e => {
+    if (e.target.tagName === 'BUTTON') {
       getTodoHandlers().then(m => {
         m.default.complete(e.target);
-
-        log(`COMPLETED ITEM: "${e.target.textContent}"`);
       });
-    });
-    listItemsFragment.appendChild(li);
+    }
   });
-
-  list.appendChild(listItemsFragment);
 
   document
     .getElementsByTagName('body')[0]
     .appendChild(list);
 })([
-  'Repot succulents',
+  'Repot plants',
   'Fill bird feeders',
-  'Restring Cordoba'
+  'Restring guitar'
 ]);

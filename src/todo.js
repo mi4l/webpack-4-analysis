@@ -1,3 +1,7 @@
 export default {
-  complete: el => el.style = 'text-decoration: line-through;'
+  complete: el => {
+    if (el.getAttribute('disabled') != 'true') {
+      el.setAttribute('disabled', true);
+    }
+  }
 };
