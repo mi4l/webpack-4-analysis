@@ -1,7 +1,6 @@
-import { log } from './utils';
+import { listItemTemplate } from './renderUtils';
 
 const getTodoHandlers = () => import('./todo');
-const listItemTemplate = text => `<li><button>${text}</button></li>`;
 
 (todos => {
   const list = document.createElement('ul');

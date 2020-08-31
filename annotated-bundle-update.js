@@ -1,8 +1,56 @@
+/* Webpack version 4.44.1 */
 /******/ (function(modules) { // webpackBootstrap
+  /*
+    This IIFE bootstraps the webpack require function
+    and also pulls any statically imported entry point
+    descendent modules into scope on some level.
+
+    The `modules` argument is a map of static modules.  Each
+    key is a path to a module, and the value is a function
+    that exposes that module to the parent scope.  Here's an
+    example from this file:
+
+    {
+      './src/index.js': function(module, __webpack_exports__, __webpack_require__) { ... },
+      './src/renderUtils.js': function(module, __webpack_exports__, __webpack_require__) { ... }
+    }
+  */
 /******/ 	// install a JSONP callback for chunk loading
 /******/ 	function webpackJsonpCallback(data) {
+  /*
+    Description:
+    This function is included when the import function
+    is used to import a file dynamically, when it's
+    needed.  The result is exposing the dynamically
+    imported module to its parent scope.
+
+    Dynamic imports add another request, but because
+    the bundle is smaller and takes less time to download,
+    the UX feels a bit snappier.  The subsequent request
+    is essentially non-existent.
+
+    What does this do?
+    `data` is an array with two indexes:
+    - 0 is an array of chunk ids
+    - 1 is a map containing modules similar to the modules
+      argument passed into the webpack IIFE
+
+    {
+      './src/todo.js': function(module, __webpack_exports__, __webpack_require__) {...}
+    }
+  */
 /******/ 		var chunkIds = data[0];
+  /*
+    Establishes a reference to an array containing chunk ids.
+    __webpack_require__.e will add chunkIds to the `installedChunks`
+    object before the webpackJsonpCallback function is called.
+    Later on, `installedChunks` will be checked against `chunkIds`
+    to see if the module paired with that id should be loaded.
+  */
 /******/ 		var moreModules = data[1];
+  /*
+
+  */
 /******/
 /******/
 /******/ 		// add "moreModules" to the modules object,
@@ -208,21 +256,21 @@
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-    "use strict";
-    eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ \"./src/utils.js\");\n\n\nconst getTodoHandlers = () => __webpack_require__.e(/*! import() */ 0).then(__webpack_require__.bind(null, /*! ./todo */ \"./src/todo.js\"));\nconst listItemTemplate = text => `<li><button>${text}</button></li>`;\n\n(todos => {\n  const list = document.createElement('ul');\n\n  list.innerHTML = todos.reduce(\n    (html, todo) => html + listItemTemplate(todo),\n    ''\n  );\n  list.addEventListener('click', e => {\n    if (e.target.tagName === 'BUTTON') {\n      getTodoHandlers().then(m => {\n        m.default.complete(e.target);\n      });\n    }\n  });\n\n  document\n    .getElementsByTagName('body')[0]\n    .appendChild(list);\n})([\n  'Repot plants',\n  'Fill bird feeders',\n  'Restring guitar'\n]);\n\n//# sourceURL=webpack:///./src/index.js?");
+  "use strict";
+  eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _renderUtils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./renderUtils */ \"./src/renderUtils.js\");\n\n\nconst getTodoHandlers = () => __webpack_require__.e(/*! import() */ 0).then(__webpack_require__.bind(null, /*! ./todo */ \"./src/todo.js\"));\n\n(todos => {\n  const list = document.createElement('ul');\n\n  list.innerHTML = todos.reduce(\n    (html, todo) => html + Object(_renderUtils__WEBPACK_IMPORTED_MODULE_0__[\"listItemTemplate\"])(todo),\n    ''\n  );\n  list.addEventListener('click', e => {\n    if (e.target.tagName === 'BUTTON') {\n      getTodoHandlers().then(m => {\n        m.default.complete(e.target);\n      });\n    }\n  });\n\n  document\n    .getElementsByTagName('body')[0]\n    .appendChild(list);\n})([\n  'Repot plants',\n  'Fill bird feeders',\n  'Restring guitar'\n]);\n\n//# sourceURL=webpack:///./src/index.js?");
 
-    /***/ }),
+  /***/ }),
 
-    /***/ "./src/utils.js":
-    /*!**********************!*\
-      !*** ./src/utils.js ***!
-      \**********************/
-    /*! exports provided: log */
-    /***/ (function(module, __webpack_exports__, __webpack_require__) {
+  /***/ "./src/renderUtils.js":
+  /*!****************************!*\
+    !*** ./src/renderUtils.js ***!
+    \****************************/
+  /*! exports provided: listItemTemplate */
+  /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-    "use strict";
-    eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"log\", function() { return log; });\nconst log = str => console.log(str);\n\n//# sourceURL=webpack:///./src/utils.js?");
+  "use strict";
+  eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"listItemTemplate\", function() { return listItemTemplate; });\nconst listItemTemplate = text => `<li><button>${text}</button></li>`;\n\n//# sourceURL=webpack:///./src/renderUtils.js?");
 
-    /***/ })
+  /***/ })
 
-    /******/ });
+  /******/ });
