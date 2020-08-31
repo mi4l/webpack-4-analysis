@@ -14,7 +14,7 @@
       './src/index.js': function(module, __webpack_exports__, __webpack_require__) { ... },
       './src/renderUtils.js': function(module, __webpack_exports__, __webpack_require__) { ... }
     }
-  */
+   */
 /******/ 	// install a JSONP callback for chunk loading
 /******/ 	function webpackJsonpCallback(data) {
   /*
@@ -38,7 +38,7 @@
     {
       './src/todo.js': function(module, __webpack_exports__, __webpack_require__) {...}
     }
-  */
+   */
 /******/ 		var chunkIds = data[0];
   /*
     Establishes a reference to an array containing chunk ids.
@@ -46,16 +46,33 @@
     object before the webpackJsonpCallback function is called.
     Later on, `installedChunks` will be checked against `chunkIds`
     to see if the module paired with that id should be loaded.
-  */
+   */
 /******/ 		var moreModules = data[1];
   /*
-
-  */
+    Establishes a reference to an object of the same shape as the
+    original `modules` argument at the top of the webpack IIFE.  These
+    modules are later added to the `modules` object.
+   */
 /******/
 /******/
 /******/ 		// add "moreModules" to the modules object,
 /******/ 		// then flag all "chunkIds" as loaded and fire callback
-/******/ 		var moduleId, chunkId, i = 0, resolves = [];
+/******/ 		var moduleId,
+  /*
+    Bucket later used to check if the module id exists in `moreModules`.  If
+    it does, set `modules[moduleId]` to be `moreModules[moduleId]`.
+   */
+              chunkId,
+  /*
+    Transient bucket later used to store individual chunk ids when looping over
+    the `chunkIds` array.  A `chunkId` is used to both cache modules and get
+    a resolve function that brings the module's code into greater scope.
+   */
+              i = 0,
+              resolves = [];
+  /*
+    An array of resolve functions populated over the next couple of lines.
+   */
 /******/ 		for(;i < chunkIds.length; i++) {
 /******/ 			chunkId = chunkIds[i];
 /******/ 			if(Object.prototype.hasOwnProperty.call(installedChunks, chunkId) && installedChunks[chunkId]) {
