@@ -211,6 +211,10 @@
 /******/ 	// This file contains only the entry chunk.
 /******/ 	// The chunk loading function for additional chunks
 /******/ 	__webpack_require__.e = function requireEnsure(chunkId) {
+  /*
+    Handles loading of dynamically imported chunks.  If successfuly, this
+    will append a script tag to the doc head.
+   */
 /******/ 		var promises = [];
 /******/
 /******/
@@ -221,13 +225,22 @@
 /******/
 /******/ 			// a Promise means "currently loading".
 /******/ 			if(installedChunkData) {
+  /*
+    This condition is false upon first load of module
+   */
 /******/ 				promises.push(installedChunkData[2]);
 /******/ 			} else {
 /******/ 				// setup Promise in chunk cache
 /******/ 				var promise = new Promise(function(resolve, reject) {
 /******/ 					installedChunkData = installedChunks[chunkId] = [resolve, reject];
+  /*
+    resolve/reject are referenced and "exported" to be used later
+   */
 /******/ 				});
 /******/ 				promises.push(installedChunkData[2] = promise);
+  /*
+    Promise is added to installedChunkData/installedChunks[chunkId] as well.
+   */
 /******/
 /******/ 				// start chunk loading
 /******/ 				var script = document.createElement('script');
@@ -236,9 +249,16 @@
 /******/ 				script.charset = 'utf-8';
 /******/ 				script.timeout = 120;
 /******/ 				if (__webpack_require__.nc) {
+  /*
+    This is truthy if a __webpack_nonce__ is added to the entry file
+    for content security policies.
+   */
 /******/ 					script.setAttribute("nonce", __webpack_require__.nc);
 /******/ 				}
-/******/ 				script.src = jsonpScriptSrc(chunkId);
+/******/ 				script.src =  jsonpScriptSrc(chunkId);
+  /*
+    This returns a string representing the file name (L142)
+   */
 /******/
 /******/ 				// create error before stack unwound to get useful stacktrace later
 /******/ 				var error = new Error();
@@ -265,6 +285,11 @@
 /******/ 				}, 120000);
 /******/ 				script.onerror = script.onload = onScriptComplete;
 /******/ 				document.head.appendChild(script);
+  /*
+   A script is created with the chunk name as the source.  When loaded,
+   the contents of a dynamically imported module is made available.  It'll
+   otherwise error.
+   */
 /******/ 			}
 /******/ 		}
 /******/ 		return Promise.all(promises);
@@ -278,13 +303,25 @@
 /******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
+  /*
+    Args:
+    exports is the exports module coming from a static import
+    name is the name of the export
+    getter is a function that returns whatever's being exported
+   */
 /******/ 		if(!__webpack_require__.o(exports, name)) {
+  /*
+    __webpack_require__.o is a `hasOwnProperty` check
+   */
 /******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
 /******/ 	};
 /******/
 /******/ 	// define __esModule on exports
 /******/ 	__webpack_require__.r = function(exports) {
+  /*
+    Creates several properties used for webpack's exports
+   */
 /******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
 /******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 /******/ 		}
@@ -318,6 +355,11 @@
 /******/
 /******/ 	// Object.prototype.hasOwnProperty.call
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+  /*
+    A wrapper function for hasOwnProperty. This is used in
+    `__webpack_require__.d` to check if an exports object already has
+    a property of a specified name.
+   */
 /******/
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
@@ -326,15 +368,56 @@
 /******/ 	__webpack_require__.oe = function(err) { console.error(err); throw err; };
 /******/
 /******/ 	var jsonpArray = window["webpackJsonp"] = window["webpackJsonp"] || [];
+  /*
+    Global reference to jsonpArray to be used with dynamic imports
+  */
 /******/ 	var oldJsonpFunction = jsonpArray.push.bind(jsonpArray);
+  /*
+   `oldJsonpFunction` is [].push
+   */
 /******/ 	jsonpArray.push = webpackJsonpCallback;
+  /*
+    jsonpArray.push is now webpackJsonpCallback
+   */
 /******/ 	jsonpArray = jsonpArray.slice();
+  /*
+    A copy of the array is created
+   */
 /******/ 	for(var i = 0; i < jsonpArray.length; i++) webpackJsonpCallback(jsonpArray[i]);
+  /*
+    Each member of the jsonpArray is
+      1. passed into webpackJsonpCallback
+      2. checks to see if chunkId (member data [0]) exists in installedChunks and that it's truthy
+      3. pushes the installedChunk's `resolve` function into the `resolves` array
+        - This comes from __webpack_require__.e,
+          var promise = new Promise(function(resolve, reject) {
+            installedChunkData = installedChunks[chunkId] = [resolve, reject];
+          });
+        - Each time an `import()` is called, it'll run through __webpack_require__.e.
+          - __webpack_require__.e first checks to see if the installedChunks[chunkId] value is 0.
+            - if it is, it will bypass executing any logic that re-"fetches" the module's code
+      4. mutates the installedChunks object and sets the chunkId to 0.
+      5. adds any included modules to the `modules` object in scope (passed in as an
+          argument to the encapsulating function)
+      6. pushes the data into the jsonpArray via the parentJsonpFunction ([].push bound to jsonpArray)
+          if the parentJsonpFunction exists
+      7. removes each item from the `resolves` queue and calls it
+
+      In this case, the jsonpArray's length is 0 and this function is never called.
+   */
 /******/ 	var parentJsonpFunction = oldJsonpFunction;
+  /*
+    parentJsonpFunction is set to oldJsonpFunction, which at this time is [].push. This is used
+    to add loaded modules to the jsonpArray (also window.webpackJsonpArray)
+   */
 /******/
 /******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = "./src/index.js");
+  /*
+    Sets __webpack_require__.s to the entrypoint and passes it into a __webpack_require__
+    call
+   */
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -345,10 +428,37 @@
   \**********************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
+  /*
+    Our main entrypoint. Here's what's being passed in:
+    module: {
+      i: './src/index.js', // the chunk id
+      l: false, // whether or not the module has been loaded
+      exports: {} // the exports of this module
+    }
 
+    After being evaluated in this file, the module is mutated to look more like this:
+    {
+      i: './src/index.js', // id remains the same
+      l: true, // has been loaded
+      exports: Module // export is now a Module
+    }
+   */
   "use strict";
   eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _renderUtils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./renderUtils */ \"./src/renderUtils.js\");\n\n\nconst getTodoHandlers = () => __webpack_require__.e(/*! import() */ 0).then(__webpack_require__.bind(null, /*! ./todo */ \"./src/todo.js\"));\n\n(todos => {\n  const list = document.createElement('ul');\n\n  list.innerHTML = todos.reduce(\n    (html, todo) => html + Object(_renderUtils__WEBPACK_IMPORTED_MODULE_0__[\"listItemTemplate\"])(todo),\n    ''\n  );\n  list.addEventListener('click', e => {\n    if (e.target.tagName === 'BUTTON') {\n      getTodoHandlers().then(m => {\n        m.default.complete(e.target);\n      });\n    }\n  });\n\n  document\n    .getElementsByTagName('body')[0]\n    .appendChild(list);\n})([\n  'Repot plants',\n  'Fill bird feeders',\n  'Restring guitar'\n]);\n\n//# sourceURL=webpack:///./src/index.js?");
+  /*
+    Code content is stringified when built and webpack encapsulation and runtime handlers
+    are injected.  Webpack uses a dependency injection pattern to expose exports from this
+    stringified file to its parent scope.
 
+    * __webpack_require__.r(__webpack_exports__) defines __esModule on exports
+    * var _renderUtils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./renderUtils */ /*\// "./src/renderUtils.js\");
+      This sets the `_renderUtils__WEBPACK_IMPORTED_MODULE_0__` variable equal to
+      the return value (export object) of the __webpack_require__ functon when passed
+      in './src/renderUtils.js'.
+    * `getTodoHandlers` function body is replaced wth a __webpack_require__.e call,
+      followed by a __webpack_require__ call with the name of the file as the argument.
+    * a sourceURL for source maps is appended to the end of the string as a comment
+   */
   /***/ }),
 
   /***/ "./src/renderUtils.js":
@@ -360,7 +470,16 @@
 
   "use strict";
   eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"listItemTemplate\", function() { return listItemTemplate; });\nconst listItemTemplate = text => `<li><button>${text}</button></li>`;\n\n//# sourceURL=webpack:///./src/renderUtils.js?");
+  /*
+    This import is similar to what we saw in the entrypoint, except we also have a __webpack_require__.d call
+    that adds a .get method to the export object that will return the function exported in the utils.js file.
 
+    1. __webpack_require__.r is called on __webpack_exports__
+    2. __webpack_exports__ is mutated
+    3. __webpack_require__.d is called on __webpack_exports__, the name of the exported function,
+      and a getter that returns functions later declared in the file
+    4. __webpack_exports__ is once again mutated with the updated exports
+    */
   /***/ })
 
   /******/ });
