@@ -69,9 +69,14 @@
     a resolve function that brings the module's code into greater scope.
    */
               i = 0,
+  /*
+    Current iteration
+   */
               resolves = [];
   /*
     An array of resolve functions populated over the next couple of lines.
+    In the body of a Promise constructor's callback, the resolve function is passed
+    in an `installedChunksData` var in the form of [resolve, reject].
    */
 /******/ 		for(;i < chunkIds.length; i++) {
 /******/ 			chunkId = chunkIds[i];
@@ -79,16 +84,35 @@
 /******/ 				resolves.push(installedChunks[chunkId][0]);
 /******/ 			}
 /******/ 			installedChunks[chunkId] = 0;
+  /*
+    Iterate over chunkIds ([0]), and if a prop of [chunkId] exists in `installedChunks`
+    and is truthy, grab its first index and add it to the resolves array.  Set the
+    installedChunks[chunkId] value to 0, meaning loaded.
+
+    Setting it to 0 also prevents it from being run a second time should
+    the same chunkId be used by a separate dynamic import.
+   */
 /******/ 		}
 /******/ 		for(moduleId in moreModules) {
 /******/ 			if(Object.prototype.hasOwnProperty.call(moreModules, moduleId)) {
 /******/ 				modules[moduleId] = moreModules[moduleId];
 /******/ 			}
+  /*
+    Add modules in `moreModules` to `modules` at the key of `moduleId`
+   */
 /******/ 		}
 /******/ 		if(parentJsonpFunction) parentJsonpFunction(data);
+  /*
+    At runtime, parentJsonpFunction is set to oldJsonpFunction, which is simply [].push
+    bound to the jsonpArray reference. What that means is if this function exists, push
+    data into the jsonpArray.
+   */
 /******/
 /******/ 		while(resolves.length) {
 /******/ 			resolves.shift()();
+  /*
+    `resolves` queue members are shifted and then called
+   */
 /******/ 		}
 /******/
 /******/ 	};
@@ -96,6 +120,10 @@
 /******/
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
+  /*
+    When a module is loaded, it's cached here.  Any subsequent load attempts
+    will first check this cache.  We saw this in the webpackJsonpCallback.
+   */
 /******/
 /******/ 	// object to store loaded and loading chunks
 /******/ 	// undefined = chunk not loaded, null = chunk preloaded/prefetched
@@ -103,36 +131,81 @@
 /******/ 	var installedChunks = {
 /******/ 		"main": 0
 /******/ 	};
+  /*
+    A quick lookup to see if a chunk should be loaded.  The webpackJsonpCallback
+    will set each modules passed to it to installedChunks[chunkId] = 0.
+   */
 /******/
 /******/
 /******/
 /******/ 	// script path function
 /******/ 	function jsonpScriptSrc(chunkId) {
+  /*
+    Creates a file name name created by concatenating the `publicPath`
+    string in webpack.config (defaults to ''), the chunkId, and '.js'.
+    This will look something like '0.js' when this bundle is executed,
+    but could look something like 'https://cdn.something.com/chunk-name.js'.
+   */
 /******/ 		return __webpack_require__.p + "" + ({}[chunkId]||chunkId) + ".js"
 /******/ 	}
 /******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
+  /*
+    The webpack require function is the primary handler of module
+    loading and encapsulation.  It's passed into each module's related
+    scope (dependency injection) as an argument, and exposes that
+    module to the parent scope.  It also has many helper methods and
+    properties set that work to malleate the bundle to fit the
+    instruction set in webpack.config.
+   */
 /******/
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
+  /*
+    If cached, exit early with cached module.
+   */
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
+  /* id */
 /******/ 			l: false,
+  /* loaded true/false */
 /******/ 			exports: {}
+  /*
+    An exports object populated using __webpack_require__.r as well
+    as the execution context of whatever module the export is coming
+    from.  For example, in the case of `renderUtils`, the object will
+    look like this:
+
+    {
+      listItemTemplate: (...)
+      Symbol(Symbol.toStringTag): "Module"
+      __esModule: true
+    }
+
+    Note the `listItemTemplate` function.
+   */
 /******/ 		};
 /******/
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+  /*
+    This call will populate the exports object with the exports
+    from the module.
+   */
 /******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
 /******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
+  /*
+    The exports object is returned, which is basically the object above
+    on line 183.
+   */
 /******/ 	}
 /******/
 /******/ 	// This file contains only the entry chunk.
