@@ -47,7 +47,6 @@
       exports: {}
     };
 
-
     modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
     module.l = true;
 
@@ -183,7 +182,7 @@
   }),
   "./src/renderUtils.js": (function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
-    
+
     eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"listItemTemplate\", function() { return listItemTemplate; });\nconst listItemTemplate = text => `<li><button>${text}</button></li>`;\n\n//# sourceURL=webpack:///./src/renderUtils.js?");
   })
 });

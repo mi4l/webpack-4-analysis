@@ -9,6 +9,7 @@ const getTodoHandlers = () => import('./todo');
     (html, todo) => html + listItemTemplate(todo),
     ''
   );
+  
   list.addEventListener('click', e => {
     if (e.target.tagName === 'BUTTON') {
       getTodoHandlers().then(m => {
