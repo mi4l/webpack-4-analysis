@@ -1,0 +1,17 @@
+{
+  "name": "static-imports",
+  "version": "0.0.0",
+  "description": "Analyzing webpack's static import bundling",
+  "main": "webpack.config.mjs",
+  "scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch"
+  },
+  "author": "Mike Skalandunas <mskalandunas@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "html-webpack-plugin": "4.5.0",
+    "webpack": "4.44.2",
+    "webpack-cli": "3.3.12"
+  }
+}
