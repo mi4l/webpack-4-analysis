@@ -1,4 +1,4 @@
-(function(modules) {
+(function(modules) { // webpackBootstrap
   function webpackJsonpCallback(data) {
     var chunkIds = data[0];
     var moreModules = data[1];
