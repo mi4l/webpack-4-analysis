@@ -1,1 +1,0 @@
-export default message = 'Are you sure you\'d like to confirm?';

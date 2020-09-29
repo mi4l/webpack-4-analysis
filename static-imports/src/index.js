@@ -1,10 +1,25 @@
-import calculate from './parser.js';
+import { listItemTemplate } from './renderUtils';
+import { complete } from './todo';
 
-(() => {
-  document.getElementById.addEventListener('click', () => {
-    calculate(document
-      .getElementById('CalculationInput')
-      .value
-    );
+(todos => {
+  const list = document.createElement('ul');
+
+  list.innerHTML = todos.reduce(
+    (html, todo) => html + listItemTemplate(todo),
+    ''
+  );
+  
+  list.addEventListener('click', e => {
+    if (e.target.tagName === 'BUTTON') {
+      complete(e.target);
+    }
   });
-})();
+
+  document
+    .getElementsByTagName('body')[0]
+    .appendChild(list);
+})([
+  'Repot plants',
+  'Fill bird feeders',
+  'Restring guitar'
+]);
