@@ -10,8 +10,8 @@
   "author": "Mike Skalandunas <mskalandunas@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "html-webpack-plugin": "^4.3.0",
-    "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12"
+    "html-webpack-plugin": "4.3.0",
+    "webpack": "4.44.2",
+    "webpack-cli": "3.3.12"
   }
 }
